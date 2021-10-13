@@ -27,6 +27,7 @@ client.connect(err => {
     const categoriesCollection = client.db("pro-fashion").collection("categories");
     const districtsCollection = client.db("pro-fashion").collection("districts");
     const addressCollection = client.db("pro-fashion").collection("address");
+    const ordersCollection = client.db("pro-fashion").collection("orders");
 
     const productsData = [
         {
@@ -726,7 +727,7 @@ client.connect(err => {
     app.post("/add-address", (req, res) => {
         addressCollection.insertOne(req.body)
             .then(response => {
-                if(response?.acknowledged === true) {
+                if (response.acknowledged === true) {
                     res.status(200).send("success")
                 } else {
                     res.status(400).send("bad")
@@ -736,10 +737,22 @@ client.connect(err => {
 
     // Add a address
     app.get("/address/:email", (req, res) => {
-        addressCollection.find({email: req.params.email})
+        addressCollection.find({ email: req.params.email })
             .toArray((err, docs) => {
                 res.send(docs)
             })
+    })
+
+    // Submit user order
+    app.post("/place-order", (req, res) => {
+        if(req.body){
+            ordersCollection.insertOne(req.body)
+            .then(response => {
+                if(response.acknowledged === true) {
+                    res.status(200).send("Order Successful.")
+                }
+            })
+        }
     })
 
     // Post all products Api
